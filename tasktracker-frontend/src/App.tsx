@@ -5,6 +5,8 @@ import { TaskStatus } from "./types";
 import { getTasks, createTask, updateTaskStatus, deleteTask, updateTask } from "./api/client";
 import { startConnection, onTaskCreated, onTaskUpdated, onTaskDeleted } from "./hub/hub";
 
+import "./App.css";
+
 const App: React.FC = () => {
     const [tasks, setTasks] = useState<TaskItem[]>([]);
     const [title, setTitle] = useState("");
@@ -22,7 +24,6 @@ const App: React.FC = () => {
             const data = await getTasks();
             setTasks(data);
         };
-
         loadTasks();
         startConnection();
 
@@ -84,85 +85,44 @@ const App: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: 20, fontFamily: "sans-serif" }}>
+        <div className="app-container">
             <h1>Real-Time Task Tracker</h1>
 
             {/* Task Form */}
-            <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", maxWidth: 400 }}>
-                <input
-                    style={{ marginBottom: 10, padding: 8 }}
-                    placeholder="Title"
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                />
-                <input
-                    style={{ marginBottom: 10, padding: 8 }}
-                    placeholder="Description"
-                    value={description}
-                    onChange={e => setDescription(e.target.value)}
-                />
-                <input
-                    style={{ marginBottom: 10, padding: 8 }}
-                    placeholder="Assigned To"
-                    value={assignedTo}
-                    onChange={e => setAssignedTo(e.target.value)}
-                />
-                <button onClick={handleAddTask} style={{ padding: 10, cursor: "pointer" }}>
-                    Add Task
-                </button>
+            <div className="task-form">
+                <input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
+                <input placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
+                <input placeholder="Assigned To" value={assignedTo} onChange={e => setAssignedTo(e.target.value)} />
+                <button onClick={handleAddTask}>Add Task</button>
             </div>
 
             {/* Task List */}
-            <ul style={{ listStyle: "none", padding: 0 }}>
+            <ul className="task-list">
                 {tasks.map(task => (
-                    <li key={task.id} style={{ marginBottom: 15, border: "1px solid #ccc", padding: 10, borderRadius: 6 }}>
+                    <li key={task.id} className="task-item">
                         {editingTaskId === task.id ? (
                             <>
-                                <input
-                                    style={{ marginBottom: 5, padding: 5 }}
-                                    value={editValues.title}
-                                    onChange={e => setEditValues(prev => ({ ...prev, title: e.target.value }))}
-                                />
-                                <input
-                                    style={{ marginBottom: 5, padding: 5 }}
-                                    value={editValues.description}
-                                    onChange={e => setEditValues(prev => ({ ...prev, description: e.target.value }))}
-                                />
-                                <input
-                                    style={{ marginBottom: 5, padding: 5 }}
-                                    value={editValues.assignedTo}
-                                    onChange={e => setEditValues(prev => ({ ...prev, assignedTo: e.target.value }))}
-                                />
-                                <button onClick={() => handleEditSave(task.id)} style={{ marginRight: 10 }}>Save</button>
-                                <button onClick={() => setEditingTaskId(null)}>Cancel</button>
+                                <input value={editValues.title} onChange={e => setEditValues(prev => ({ ...prev, title: e.target.value }))} />
+                                <input value={editValues.description} onChange={e => setEditValues(prev => ({ ...prev, description: e.target.value }))} />
+                                <input value={editValues.assignedTo} onChange={e => setEditValues(prev => ({ ...prev, assignedTo: e.target.value }))} />
+                                <div className="task-actions">
+                                    <button className="save" onClick={() => handleEditSave(task.id)}>Save</button>
+                                    <button className="cancel" onClick={() => setEditingTaskId(null)}>Cancel</button>
+                                </div>
                             </>
                         ) : (
                             <>
                                 <div><b>Title:</b> {task.title}</div>
                                 <div>Assigned to: {task.assignedTo}</div>
                                 <div>Description: {task.description}</div>
-                                <div>
-                                    <label>Status: </label>
-                                    <select
-                                        value={task.status}
-                                        onChange={(e) => handleStatusChange(task.id, Number(e.target.value))}
-                                    >
+                                <div className="task-actions">
+                                    <select value={task.status} onChange={(e) => handleStatusChange(task.id, Number(e.target.value))}>
                                         <option value={TaskStatus.New}>New</option>
                                         <option value={TaskStatus.InProgress}>InProgress</option>
                                         <option value={TaskStatus.Completed}>Completed</option>
                                     </select>
-                                    <button
-                                        onClick={() => handleDelete(task.id)}
-                                        style={{ marginLeft: 10, cursor: "pointer" }}
-                                    >
-                                        Delete
-                                    </button>
-                                    <button
-                                        onClick={() => handleEditClick(task)}
-                                        style={{ marginLeft: 10, cursor: "pointer" }}
-                                    >
-                                        Edit
-                                    </button>
+                                    <button className="delete" onClick={() => handleDelete(task.id)}>Delete</button>
+                                    <button className="edit" onClick={() => handleEditClick(task)}>Edit</button>
                                 </div>
                             </>
                         )}
