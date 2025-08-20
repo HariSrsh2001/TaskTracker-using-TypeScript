@@ -8,10 +8,13 @@ import { startConnection, onTaskCreated, onTaskUpdated, onTaskDeleted } from "./
 import "./App.css";
 
 const App: React.FC = () => {
+    // state for all tasks
     const [tasks, setTasks] = useState<TaskItem[]>([]);
+    // states for creating new task
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [assignedTo, setAssignedTo] = useState("");
+    // state for editing an existing task
     const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
     const [editValues, setEditValues] = useState<{ title: string; description: string; assignedTo: string }>({
         title: "",
@@ -20,40 +23,48 @@ const App: React.FC = () => {
     });
 
     useEffect(() => {
+        // fetch tasks initially
         const loadTasks = async () => {
             const data = await getTasks();
             setTasks(data);
         };
         loadTasks();
+
+        // start real-time connection (SignalR/WebSocket)
         startConnection();
 
+        // when a task is created, update local state
         onTaskCreated((task) =>
             setTasks(prev => {
-                if (prev.some(t => t.id === task.id)) return prev;
+                if (prev.some(t => t.id === task.id)) return prev; // avoid duplicates
                 return [...prev, task];
             })
         );
 
+        // when a task is updated, replace it in local state
         onTaskUpdated((updated) =>
             setTasks(prev => prev.map(t => t.id === updated.id ? updated : t))
         );
 
+        // when a task is deleted, remove it from local state
         onTaskDeleted((id) =>
             setTasks(prev => prev.filter(t => t.id !== id))
         );
     }, []);
 
+    // add a new task
     const handleAddTask = async () => {
-        if (!title || !assignedTo) return;
+        if (!title || !assignedTo) return; // must have title + assignee
         const newTask: CreateTaskDTO = { title, description, assignedTo };
         try {
-            await createTask(newTask);
-            setTitle(""); setDescription(""); setAssignedTo("");
+            await createTask(newTask); // server will trigger onTaskCreated
+            setTitle(""); setDescription(""); setAssignedTo(""); // reset form
         } catch (err) {
             console.error("Add Task Error:", err);
         }
     };
 
+    // change task status (New/InProgress/Completed)
     const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
         try {
             await updateTaskStatus(taskId, newStatus);
@@ -62,6 +73,7 @@ const App: React.FC = () => {
         }
     };
 
+    // delete task
     const handleDelete = async (id: string) => {
         try {
             await deleteTask(id);
@@ -70,15 +82,17 @@ const App: React.FC = () => {
         }
     };
 
+    // enable editing mode for a task
     const handleEditClick = (task: TaskItem) => {
         setEditingTaskId(task.id);
         setEditValues({ title: task.title, description: task.description, assignedTo: task.assignedTo });
     };
 
+    // save edited task
     const handleEditSave = async (taskId: string) => {
         try {
-            await updateTask(taskId, editValues);
-            setEditingTaskId(null);
+            await updateTask(taskId, editValues); // server will trigger onTaskUpdated
+            setEditingTaskId(null); // exit edit mode
         } catch (err) {
             console.error("Update Task Error:", err);
         }
@@ -88,7 +102,7 @@ const App: React.FC = () => {
         <div className="app-container">
             <h1>Real-Time Task Tracker</h1>
 
-            {/* Task Form */}
+            {/* Task creation form */}
             <div className="task-form">
                 <input placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
                 <input placeholder="Description" value={description} onChange={e => setDescription(e.target.value)} />
@@ -96,11 +110,12 @@ const App: React.FC = () => {
                 <button onClick={handleAddTask}>Add Task</button>
             </div>
 
-            {/* Task List */}
+            {/* Task list */}
             <ul className="task-list">
                 {tasks.map(task => (
                     <li key={task.id} className="task-item">
                         {editingTaskId === task.id ? (
+                            // edit mode UI
                             <>
                                 <input value={editValues.title} onChange={e => setEditValues(prev => ({ ...prev, title: e.target.value }))} />
                                 <input value={editValues.description} onChange={e => setEditValues(prev => ({ ...prev, description: e.target.value }))} />
@@ -111,16 +126,19 @@ const App: React.FC = () => {
                                 </div>
                             </>
                         ) : (
+                            // view mode UI
                             <>
                                 <div><b>Title:</b> {task.title}</div>
-                                <div>Assigned to: {task.assignedTo}</div>
-                                <div>Description: {task.description}</div>
+                                <div><b>Description:</b> {task.description}</div>
+                                <div><b>Assigned to:</b> {task.assignedTo}</div>
                                 <div className="task-actions">
+                                    {/* change status dropdown */}
                                     <select value={task.status} onChange={(e) => handleStatusChange(task.id, Number(e.target.value))}>
                                         <option value={TaskStatus.New}>New</option>
                                         <option value={TaskStatus.InProgress}>InProgress</option>
                                         <option value={TaskStatus.Completed}>Completed</option>
                                     </select>
+                                    {/* delete & edit buttons */}
                                     <button className="delete" onClick={() => handleDelete(task.id)}>Delete</button>
                                     <button className="edit" onClick={() => handleEditClick(task)}>Edit</button>
                                 </div>

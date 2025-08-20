@@ -30,8 +30,8 @@ namespace TaskTracker.Services.Implementations
         public async Task<TaskItem> CreateTaskAsync(TaskItem task)
         {
             task.Id = Guid.NewGuid();
-            task.CreatedAt = DateTime.UtcNow;
-            task.Modified = DateTime.UtcNow;
+            task.CreatedAt = DateTime.Now;
+            task.Modified = DateTime.Now;
             await _taskRepository.AddAsync(task);
             return task;
         }
@@ -45,7 +45,7 @@ namespace TaskTracker.Services.Implementations
             existing.Description = task.Description;
             existing.AssignedTo = task.AssignedTo;
             existing.Status = task.Status;
-            existing.Modified = DateTime.UtcNow;
+            existing.Modified = DateTime.Now;
 
             await _taskRepository.UpdateAsync(existing);
             return existing;
