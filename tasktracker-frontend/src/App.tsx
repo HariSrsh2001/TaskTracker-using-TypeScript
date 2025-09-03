@@ -1,7 +1,6 @@
 ﻿import React, { useEffect, useState } from "react";
 import type { TaskItem, CreateTaskDTO } from "./types";
 import { TaskStatus } from "./types";
-
 import { getTasks, createTask, updateTaskStatus, deleteTask, updateTask } from "./api/client";
 import { startConnection, onTaskCreated, onTaskUpdated, onTaskDeleted } from "./hub/hub";
 
