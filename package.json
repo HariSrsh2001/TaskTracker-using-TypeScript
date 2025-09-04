@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@fluentui/react-components": "^9.69.0",
+    "@microsoft/signalr": "^9.0.6",
+    "axios": "^1.11.0",
+    "shaka-player": "^4.16.0"
+  }
+}

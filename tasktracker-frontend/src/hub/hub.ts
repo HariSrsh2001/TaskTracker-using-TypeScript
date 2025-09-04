@@ -1,40 +1,25 @@
 ﻿import * as signalR from "@microsoft/signalr";
 import type { TaskItem } from "../types";
 
-let connection: signalR.HubConnection; // holds the SignalR connection instance
+let connection: signalR.HubConnection;
 
-// Start and configure the SignalR connection
 export const startConnection = async () => {
     connection = new signalR.HubConnectionBuilder()
-        .withUrl("http://localhost:5023/taskHub") // backend SignalR hub URL
-        .withAutomaticReconnect() // auto reconnect if connection drops
+        .withUrl("http://localhost:5023/taskHub")
+        .withAutomaticReconnect()
         .build();
 
-    // event when client successfully reconnects
-    connection.onreconnected(() => console.log("SignalR Reconnected"));
-
-    // event when client disconnects
-    connection.onclose(() => console.log("SignalR Disconnected"));
+    connection.onreconnected(() => console.log("SignalR reconnected"));
+    connection.onclose(() => console.log("SignalR disconnected"));
 
     try {
-        await connection.start(); // establish connection
+        await connection.start();
         console.log("SignalR Connected");
     } catch (err) {
-        console.error(err); // log error if connection fails
+        console.error("SignalR Error:", err);
     }
 };
 
-// Listen for "TaskCreated" event from server
-export const onTaskCreated = (callback: (task: TaskItem) => void) => {
-    connection.on("TaskCreated", callback);
-};
-
-// Listen for "TaskUpdated" event from server
-export const onTaskUpdated = (callback: (task: TaskItem) => void) => {
-    connection.on("TaskUpdated", callback);
-};
-
-// Listen for "TaskDeleted" event from server
-export const onTaskDeleted = (callback: (id: string) => void) => {
-    connection.on("TaskDeleted", callback);
-};
+export const onTaskCreated = (cb: (task: TaskItem) => void) => connection.on("TaskCreated", cb);
+export const onTaskUpdated = (cb: (task: TaskItem) => void) => connection.on("TaskUpdated", cb);
+export const onTaskDeleted = (cb: (id: string) => void) => connection.on("TaskDeleted", cb);
