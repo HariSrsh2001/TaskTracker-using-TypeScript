@@ -2,19 +2,25 @@
 import { TaskForm } from "./components/TaskForm";
 import { TaskList } from "./components/TaskList";
 import { PlayerPage } from "./pages/PlayerPage";
-import { makeStyles } from "@fluentui/react-components";
+import { makeStyles, tokens } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
     container: {
-        padding: "20px",
-        maxWidth: "900px",
+        padding: tokens.spacingVerticalL,
+        maxWidth: "900px", // Use string with px
         margin: "0 auto",
         display: "flex",
         flexDirection: "column",
-        gap: "40px"
+        gap: tokens.spacingVerticalXL,
     },
-    section: { display: "flex", flexDirection: "column", gap: "16px" },
-    heading: { margin: 0 }
+    section: {
+        display: "flex",
+        flexDirection: "column",
+        gap: tokens.spacingVerticalM,
+    },
+    heading: {
+        margin: 0,
+    },
 });
 
 export default function App() {
@@ -27,6 +33,7 @@ export default function App() {
                 <TaskForm />
                 <TaskList />
             </section>
+
             <section className={styles.section}>
                 <h1 className={styles.heading}>🎥 Video Player</h1>
                 <PlayerPage />
