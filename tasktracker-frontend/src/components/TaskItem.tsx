@@ -9,32 +9,13 @@ const useStyles = makeStyles({
         display: "flex",
         flexDirection: "column",
         gap: tokens.spacingVerticalS,
-        cursor: "grab", // drag & drop still works
+        cursor: "grab",
     },
-    actions: {
-        display: "flex",
-        gap: tokens.spacingHorizontalS,
-        marginTop: tokens.spacingVerticalS,
-    },
-    input: {
-        padding: tokens.spacingVerticalXS,
-        borderRadius: tokens.borderRadiusSmall,
-        border: `1px solid ${tokens.colorNeutralStroke1}`,
-    },
-    label: {
-        fontWeight: 600,
-        marginRight: tokens.spacingHorizontalXS,
-    },
-    deleteButton: {
-        backgroundColor: tokens.colorPaletteRedBackground3,
-        color: tokens.colorNeutralForegroundInverted,
-        "&:hover": { backgroundColor: tokens.colorPaletteRedBackground2 },
-    },
-    editButton: {
-        backgroundColor: tokens.colorBrandBackground,
-        color: tokens.colorNeutralForegroundInverted,
-        "&:hover": { backgroundColor: tokens.colorBrandBackgroundHover },
-    },
+    actions: { display: "flex", gap: tokens.spacingHorizontalS, marginTop: tokens.spacingVerticalS },
+    input: { padding: tokens.spacingVerticalXS, borderRadius: tokens.borderRadiusSmall, border: `1px solid ${tokens.colorNeutralStroke1}` },
+    label: { fontWeight: 600, marginRight: tokens.spacingHorizontalXS },
+    deleteButton: { backgroundColor: tokens.colorPaletteRedBackground3, color: tokens.colorNeutralForegroundInverted, "&:hover": { backgroundColor: tokens.colorPaletteRedBackground2 } },
+    editButton: { backgroundColor: tokens.colorBrandBackground, color: tokens.colorNeutralForegroundInverted, "&:hover": { backgroundColor: tokens.colorBrandBackgroundHover } },
     statusNew: { backgroundColor: "#0078d4", color: "white" },
     statusInProgress: { backgroundColor: "#ffb900", color: "black" },
     statusCompleted: { backgroundColor: "#107c10", color: "white" },
@@ -63,7 +44,6 @@ export function TaskCard({ task }: { task: TaskItem }) {
 
     const handleSave = async () => {
         await updateTask(task.id, { title, description, assignedTo });
-        updateTaskStatus(task.id, TaskStatus.New); // reset status to New (blue) after edit
         setIsEditing(false);
     };
 
